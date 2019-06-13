@@ -1,0 +1,422 @@
+\documentclass[11pt,wide]{mwart}
+
+\usepackage[utf8]{inputenc}  % Polskie literki...
+%\usepackage[OT4,plmath]{polski}% Polskie tytuły, data, bibliografia, itp.
+
+\usepackage{graphicx}    % Pakiet pozwalający ,,wklejać'' grafikę...
+%\usepackage{caption}
+%\usepackage{subcaption}
+\usepackage{epstopdf}
+
+\usepackage[T1]{fontenc}
+
+\usepackage{amsmath,amssymb,amsfonts,amsthm,mathtools}
+% Dołączamy zestaw różnych przydatnych znaczków ...
+
+\usepackage{bbm}               % \mathbbm{N} - zbior liczb naturalnych
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{enumerate}
+\usepackage{pdfpages}
+
+
+\newtheorem*{remark}{Uwaga}
+\newtheorem*{mytheorem}{Twierdzenie}
+
+
+\usepackage{color}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\title{Monte Carlo simulation of an insurance}
+\date{\today}
+\author{Tomasz Jurczyk, Denis Grenda, Michał Smoliński\footnote{Tomasz Jurczyk - coding} \footnote{Denis Grenda - coding} \footnote{Michał Smolinski - documentation} }
+
+\begin{document}
+
+\maketitle
+
+\section{Description of a problem}
+
+Consider a Markov Chain given by graph \ref{transition_graph}. State 1 is interpreted as active, various states 2 represent different stages of some sickness and state 3 represents death. In any given year there is also a chance to remain in your current state.\\
+The probability of transitions
+are given by fig. \ref{transition_probs}
+where $T_1(t) = \frac{l_t}{l_0}$, $T_2(t) = min(10 \frac{l_t}{l_0}, 1)$ $T_{2'} =min(50 \frac{l_t}{l_0}, 1)$ and $T_{2''} = min(250 \frac{l_t}{l_0}, 1)$, provided that $l_t$ is a respective lifetable. Assumed interest rate is 0.02.
+\begin{figure}[!htbp]
+	\caption{State transition graph}
+	\label{transition_graph}
+	\includegraphics[width=10cm]{transition_graph}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{State transition probabilities}
+	\label{transition_probs}
+	\includegraphics[width=18cm]{transition_probs}
+	\centering
+\end{figure}
+
+\newpage
+
+\section{State transition probabilities}
+
+Figures \ref{trans1M} - \ref{trans2xxF} contain transition probabilities for states listed in previous part of the document.\\
+Figs \ref{trans1M} and \ref{trans1F} tell us how likely is transition from state 1. The line listed in red is basically the lifetable data. The line in blue is similar to lifetable's reciprocal, and it presents the probability of deceasing from other reasons than modeled disease. On the other hand, probability of getting sick (in green) is roughly constant over time\\
+In figures \ref{trans2M} and \ref{trans2F} we see transitions from state 2. Probability of getting healthy is constant over time (up to age 77 ), just like the prob. of staying in this state. Getting deceased outright from state 2 becomes dramatically more likely after age 60\\
+Figures \ref{trans2xM} and \ref{trans2xxF} show us transitions from state 2'. They looks similar to state 2 plots (probabilities of getting active 2 and of progressing to 2'' are constant), but rise in $p_{2',3}$ and fall in $p_{2',2'}$ are more sharp. After age 62 it is unlikely to survive a year in state 2'.\\
+State 2'' is terminal one. Hence figures \ref{trans2xxM} and \ref{trans2xxM} show only probabilities of staying alive and getting dead, which are reciprocals of each other. After age 45 it is unlikely to survive a year in that state.
+
+\begin{figure}[!htbp]
+	\caption{Transition probabilities from state 1 - male}
+	\label{trans1M}
+	\includegraphics[width=18cm]{trans1M}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Transition probabilities from state 1 - female}
+	\label{trans1F}
+	\includegraphics[width=18cm]{trans1F}
+	\centering
+\end{figure}
+
+
+\begin{figure}[!htbp]
+	\caption{Transition probabilities from state 2 - male}
+	\label{trans2M}
+	\includegraphics[width=18cm]{trans2M}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Transition probabilities from state 2 - female}
+	\label{trans2F}
+	\includegraphics[width=18cm]{trans2F}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Transition probabilities from state 2' - male}
+	\label{trans2xM}
+	\includegraphics[width=18cm]{trans2xM}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Transition probabilities from state 2' - female}
+	\label{trans2xF}
+	\includegraphics[width=18cm]{trans2xF}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Transition probabilities from state 2'' - male}
+	\label{trans2xxM}
+	\includegraphics[width=18cm]{trans2xxM}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Transition probabilities from state 2'' - female}
+	\label{trans2xxF}
+	\includegraphics[width=18cm]{trans2xxF}
+	\centering
+\end{figure}
+
+
+
+\newpage
+
+\section{Task 1 - state occupancy periods}
+
+Figures \ref{1occ}, \ref{2occ}, \ref{2xocc} and \ref{2xxocc} show us, how much does average person spend in respective state. The results were achieved by performing 500 simulations, with 300 thousand random lives each, then taking the average for each simulation. Every live is simulated using the distribution implied by lifetables.\\\\
+Figure \ref{1occ} reads that people generally stay active for at least few decades (on average 66.97 years for men and 74.46 for women). 
+Figures \ref{2occ}, \ref{2xocc}, \ref{2xxocc} describe the course of disease. The illness progresses very rapidly, causing that average affected lives less than three years.\\\\
+Mean lengths of each "2" stage are:
+\begin{itemize}
+	\item state 2: 1.18 years for males and 1.35 years for females,
+	\item state 2': 0.53 years for males and 0.66 for females,
+	\item state 2'': 0.227 years for males and 0.5 years for females.
+\end{itemize}
+
+
+\begin{figure}[!htbp]
+	\caption{Time spent in state 1}
+	\label{1occ}
+	\includegraphics[width=18cm]{1occ}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Time spent in state 2}
+	\label{2occ}
+	\includegraphics[width=18cm]{2occ}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Time spent in state 2'}
+	\label{2xocc}
+	\includegraphics[width=18cm]{2xocc}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Time spent in state 2''}
+	\label{2xxocc}
+	\includegraphics[width=18cm]{2xxocc}
+	\centering
+\end{figure}
+
+
+
+\newpage
+
+\section{Task 2 - benefit calculation}
+
+Consider following payment policy:
+
+\begin{itemize}
+	\item State 2 - 15000 PLN at the end of each year which person began in this state
+	\item  State 2’ - 25000 PLN at the end of each year which person began in this state
+	\item  State 2” - 100000 PLN lump sum at the end of each year which person entered this state + 50000 PLN at
+	the end of each year which person began in this state
+	\item  State 3 - 100000 PLN lump sum at the end of each year which person entered this state
+\end{itemize}
+
+Sum of total benefits are plotted in fig. \ref{TotBen}. Average males' benefit is 55 189.71 and females' benefit is 60 512.67\\
+Figures \ref{Ben2} - \ref{Ben3} show average benefits in respeective non-active states. Benefits at state 2' are the smallest, averaging under 9000. The largest are benefits at state 3, which reach over 20000
+
+\begin{figure}[!htbp]
+	\caption{Total benefits}
+	\label{TotBen}
+	\includegraphics[width=18cm]{TBen}
+	\centering
+\end{figure}
+
+
+
+\begin{figure}[!htbp]
+	\caption{Benefits at state 2}
+	\label{Ben2}
+	\includegraphics[width=18cm]{Ben2}
+	\centering
+\end{figure}
+
+
+\begin{figure}[!htbp]
+	\caption{Benefits at state 2'}
+	\label{Ben2x}
+	\includegraphics[width=18cm]{Ben2x}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Benefits at state 2''}
+	\label{Ben2xx}
+	\includegraphics[width=18cm]{Ben2xx}
+	\centering
+\end{figure}
+
+
+\begin{figure}[!htbp]
+	\caption{Benefits at state 3}
+	\label{Ben3}
+	\includegraphics[width=18cm]{Ben3}
+	\centering
+\end{figure}
+
+
+\newpage
+
+\section{Task 3 - net premiums}
+
+Consider the payment policy, detailed in previous section. Male and female net premiums are shown in figure \ref{YearlyPremiums}. Male premiums average at 1 541.74 and female ones at 1 605.29.\\
+The difference is around 4 percent. Because net premiums are closely related to actuarial present value of the benefits, we may conclude that present value of the benefits are similar for both sexes, despite vast difference in the sum of benefits.\\
+Differences in calculated values are very low between simulations. The ninety-five percent confidence intervals are:
+\begin{itemize}
+	\item $[1 541.31, 1 542.18 ]$ for male premiums
+	\item $ [1 604.76, 1 605.82 ]$ for female premiums
+\end{itemize}
+
+\begin{figure}[!htbp]
+	\caption{Yearly net premiums}
+	\label{YearlyPremiums}
+	\includegraphics[width=18cm]{YearlyPremiums}
+	\centering
+\end{figure}
+
+\newpage
+
+\section{Task 4 - company's profit}
+
+We want to calculate the long-term profitablilty of the insurance for its issuer. To achieve this, we simulate the surplus process, given by:
+
+$$S_t = C + P_t  - B_t $$
+
+where $C$ is the starting capital, $P_t$ is the sum of premiums up to time $t$ and $B_t$ is the sum of benefits up to time $t$. \\
+We perform the simulation by calculating 100 random paths of $S_t$ process, assuming starting capital of 10 million, and 5000 clients, each aged 25, but of random health status. \\
+The results are shown in fig. \ref{balance0}. Almost all the paths hit zero between 40th and 50th year, what means that after 40 years the insurance brings net loss, and its term should be restricted.
+
+\begin{figure}[!htbp]
+	\caption{Company's surplus on considered insurance}
+	\label{balance0}
+	\includegraphics[width=14cm]{balance0}
+	\centering
+\end{figure}
+
+\newpage
+
+\section{Task 5 - default probability under net premium}
+
+Using Monte Carlo simulation, we estimated the fifty-year probability of default as $92\%$, if we take assumptions from task 4. It turned out that maintaining that insurance product is highly inprofitable long-term.\\\\
+Figure \ref{defprobR0} contains the probability of ruin for net premium. The plot tells us that even with reserves equal to 20 mil, company goes bankrupt in nearly half of cases.
+
+\begin{figure}[!htbp]
+	\caption{Fifty-year probability of default for $r = 0$ and different starting reserves}
+	\label{defprobR0}
+	\includegraphics[width=14cm]{defprobR0}
+	\centering
+\end{figure}
+
+
+\section{Task 6 - linear premium}
+
+In this task we assume that insured people pay linear premium $P = (1+r)N$ where $N$ is the net premium and $r$ is some fixed coefficient ($r = 0$ means that insured pay net premium).\\
+We want to examine how the choice of $r$ influence the probability of default.\\
+The results are visible in figures \ref{defprob5mM} and \ref{DefProb10M}. In figure \ref{defprob5m} we see the influence of parameter $r$ when $C = 5'000'000$. Setting $r = 0.12$ suffices to avoid default.\\
+Fig. \ref{DefProb10M} shows such probability when $C = 10'000'000$ (assumptions from task 4). In order to stay solvent for fifty years, one must set $r > 0.1$.\\
+Fig. \ref{DefProb3D} show how the probability is dependent on $C$ and $r$. Conclusion from it is that one should set $C$ larger that 16 mil or $C$ at least 10 mil and $r$ at least $0.1$. Setting starting reserves under 10 mil is very risky.
+
+\begin{figure}[!htbp]
+	\caption{Probability of default, assuming starting capital of 5 mil.}
+	\label{defprob5m}
+	\includegraphics[width=14cm]{defprob5m}
+	\centering
+\end{figure}
+
+\begin{figure}[!htbp]
+	\caption{Probability of default, assuming starting capital of 10 mil.}
+	\label{DefProb10M}
+	\includegraphics[width=14cm]{DefProb10M}
+	\centering
+\end{figure}
+\begin{figure}[!htbp]
+	\caption{Probability of default, at different starting capitals and $r$ coefficients}
+	\label{DefProb3D}
+	\includegraphics[width=18cm]{DefProb3D}
+	\centering
+\end{figure}
+
+\newpage
+
+\section{Appendix - lifetables used}
+\label{lifetables}
+
+Lifetables used here are featured in tables \ref{ttz_m} and \ref{ttz_k}. They are also available at URL \url{https://stat.gov.pl/download/gfx/portalinformacyjny/pl/defaultaktualnosci/5470/2/11/1/trwanie_zycia_w_2016.zip} and in the repository \url{https://github.com/ozonowicz/health-monte-carlo} (file \tt{ttz.csv})
+
+\section{Appendix - R code}
+The code used for generating the results is available in the repository \url{https://github.com/ozonowicz/health-monte-carlo}
+
+\begin{table}[!htbp]
+	\centering
+	\label{ttz_m}
+	\caption{TTZ16-M life tables, used for modeling male lifetime}
+	\begin{tabular}{|l|l|l|l|l|l|l|l|}
+		\hline
+		$x$ & $l_x$  & $x$ & $l_x$ & $x$ & $l_x$ & $x$ & $l_x$ \\ \hline
+		0   & 100000 & 26  & 98591 & 51  & 92126 & 76  & 51467 \\ \hline
+		1   & 99552  & 27  & 98494 & 52  & 91445 & 77  & 48810 \\ \hline
+		2   & 99529  & 28  & 98393 & 53  & 90702 & 78  & 46076 \\ \hline
+		3   & 99510  & 29  & 98289 & 54  & 89892 & 79  & 43270 \\ \hline
+		4   & 99494  & 30  & 98179 & 55  & 89010 & 80  & 40402 \\ \hline
+		5   & 99481  & 31  & 98064 & 56  & 88053 & 81  & 37488 \\ \hline
+		6   & 99469  & 32  & 97941 & 57  & 87017 & 82  & 34546 \\ \hline
+		7   & 99459  & 33  & 97810 & 58  & 85898 & 83  & 31599 \\ \hline
+		8   & 99449  & 34  & 97670 & 59  & 84694 & 84  & 28671 \\ \hline
+		9   & 99439  & 35  & 97521 & 60  & 83401 & 85  & 25790 \\ \hline
+		10  & 99429  & 36  & 97361 & 61  & 82019 & 86  & 22981 \\ \hline
+		11  & 99418  & 37  & 97190 & 62  & 80547 & 87  & 20274 \\ \hline
+		12  & 99407  & 38  & 97006 & 63  & 78986 & 88  & 17693 \\ \hline
+		13  & 99395  & 39  & 96806 & 64  & 77336 & 89  & 15262 \\ \hline
+		14  & 99380  & 40  & 96589 & 65  & 75600 & 90  & 13001 \\ \hline
+		15  & 99362  & 41  & 96351 & 66  & 73781 & 91  & 10926 \\ \hline
+		16  & 99337  & 42  & 96089 & 67  & 71883 & 92  & 9048  \\ \hline
+		17  & 99301  & 43  & 95800 & 68  & 69909 & 93  & 7376  \\ \hline
+		18  & 99254  & 44  & 95481 & 69  & 67862 & 94  & 5912  \\ \hline
+		19  & 99195  & 45  & 95128 & 70  & 65742 & 95  & 4653  \\ \hline
+		20  & 99124  & 46  & 94738 & 71  & 63551 & 96  & 3592  \\ \hline
+		21  & 99044  & 47  & 94309 & 72  & 61288 & 97  & 2716  \\ \hline
+		22  & 98958  & 48  & 93836 & 73  & 58951 & 98  & 2009  \\ \hline
+		23  & 98869  & 49  & 93318 & 74  & 56536 & 99  & 1451  \\ \hline
+		24  & 98778  & 50  & 92749 & 75  & 54042 & 100 & 1022  \\ \hline
+		25  & 98685  &     &       &     &       &     &       \\ \hline
+	\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+	\centering
+	\label{ttz_k}
+	\caption{TTZ16-K life tables, used for modeling female lifetime}
+	\begin{tabular}{|l|l|l|l|l|l|l|l|}
+		\hline
+		$x$ & $l_x$  & $x$ & $l_x$ & $x$ & $l_x$ & $x$ & $l_x$ \\ \hline
+		0   & 100000 & 26  & 99281 & 51  & 97028 & 76  & 75016 \\ \hline
+		1   & 99645  & 27  & 99256 & 52  & 96761 & 77  & 73012 \\ \hline
+		2   & 99621  & 28  & 99230 & 53  & 96464 & 78  & 70822 \\ \hline
+		3   & 99606  & 29  & 99203 & 54  & 96136 & 79  & 68426 \\ \hline
+		4   & 99597  & 30  & 99173 & 55  & 95774 & 80  & 65807 \\ \hline
+		5   & 99589  & 31  & 99141 & 56  & 95375 & 81  & 62950 \\ \hline
+		6   & 99581  & 32  & 99107 & 57  & 94936 & 82  & 59853 \\ \hline
+		7   & 99573  & 33  & 99068 & 58  & 94453 & 83  & 56521 \\ \hline
+		8   & 99565  & 34  & 99027 & 59  & 93925 & 84  & 52969 \\ \hline
+		9   & 99558  & 35  & 98982 & 60  & 93348 & 85  & 49224 \\ \hline
+		10  & 99552  & 36  & 98932 & 61  & 92719 & 86  & 45323 \\ \hline
+		11  & 99546  & 37  & 98878 & 62  & 92036 & 87  & 41311 \\ \hline
+		12  & 99539  & 38  & 98818 & 63  & 91296 & 88  & 37242 \\ \hline
+		13  & 99531  & 39  & 98752 & 64  & 90496 & 89  & 33174 \\ \hline
+		14  & 99521  & 40  & 98679 & 65  & 89632 & 90  & 29166 \\ \hline
+		15  & 99510  & 41  & 98597 & 66  & 88704 & 91  & 25282 \\ \hline
+		16  & 99496  & 42  & 98506 & 67  & 87707 & 92  & 21577 \\ \hline
+		17  & 99479  & 43  & 98405 & 68  & 86640 & 93  & 18108 \\ \hline
+		18  & 99458  & 44  & 98291 & 69  & 85501 & 94  & 14922 \\ \hline
+		19  & 99436  & 45  & 98163 & 70  & 84287 & 95  & 12057 \\ \hline
+		20  & 99414  & 46  & 98020 & 71  & 82993 & 96  & 9536  \\ \hline
+		21  & 99393  & 47  & 97862 & 72  & 81614 & 97  & 7371  \\ \hline
+		22  & 99373  & 48  & 97685 & 73  & 80140 & 98  & 5558  \\ \hline
+		23  & 99352  & 49  & 97488 & 74  & 78561 & 99  & 4082  \\ \hline
+		24  & 99329  & 50  & 97270 & 75  & 76859 & 100 & 2913  \\ \hline
+		25  & 99306  &     &       &     &       &     &       \\ \hline
+	\end{tabular}
+\end{table}
+
+\newpage
+
+
+
+\end{document}
